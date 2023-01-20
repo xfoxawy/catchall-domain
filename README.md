@@ -1,6 +1,6 @@
 # Overview
 
-given the service scalability requirements, specifically on the massive amount events that need to be ingested I was faced with two options as datastores when it came to the design, my initial though was this seems like an analytical service, lets keep the service layer simple but open for horizontal scale and leverage a datastore capabilities to support the huge amount of writes.
+given the service scalability requirements, specifically on the massive amount events that need to be ingested I was faced with two options as datastores when it came to the design, my initial thought was this seems like an analytical service, lets keep the service layer simple but open for horizontal scale and leverage a datastore capabilities to support the huge amount of writes.
 
 ## Constraints
 
@@ -40,7 +40,6 @@ The way the keys are sharded early on will make huge difference on how the syste
 * deploying two sets of the service, a set responsible for ingestion and other set for reading domain status.
 ![Simple Diagram!](flow.png)
 
-
 ### optimizations
 
 * using [hashed index](https://www.mongodb.com/docs/manual/indexes/#hashed-indexes), keys will be domain names, compatible with Hashed sharding.
@@ -57,7 +56,8 @@ The way the keys are sharded early on will make huge difference on how the syste
 
 #### medium
 
-* Restful is bad for streaming its built on top of HTTP/1.1, I'd say for a service like this lets use GRPC it supports streaming and offers great multiplexing features
+* Restful is bad for streaming its built on top of HTTP/1.1, I'd recommend for the service we can use gRPC it supports streaming and offers great multiplexing features.
+* The less the payload size the better, alternative for json a good replacement would be Thrift, Avro or Protobuf.
 * the service can have serve two interfaces ( its a matter of adding a command similar `serve-http`).
 * if I had the choice I'd choose a different NoSQL datastore, Redis could be very good candidate (although retention could be a problem from memory size prospective), other solution could be DynamoDB takes the hassle of sharding and replication away with its magic (although it could be more expensive) .
-* another solution could be using a [materialized Kafka topics](https://mail-narayank.medium.com/stream-aggregation-in-kafka-e57aff20d8ad) where all events are directly streamed to Kafka, sharded properly and distributed among multiple topics, with a small service layer to wrap the domain status querying logic.
+* another solution could be using a [materialized Kafka topics](https://mail-narayank.medium.com/stream-aggregation-in-kafka-e57aff20d8ad) where all events are directly streamed to Kafka, sharded properly and distributed among multiple topics, with a small service layer to wrap the domain status querying logic

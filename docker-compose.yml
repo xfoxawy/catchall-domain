@@ -14,7 +14,7 @@ services:
       - mongodb_data_container:/data/db
   
   api:
-    build: ./
+    build: ./Dockerfile.dev
     command: gin --appPort=9090 -i serve-http
     ports:
       - "9090:9090"

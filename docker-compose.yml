@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  db:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: catchall
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+  
+  api:
+    build: ./Dockerfile.dev
+    command: gin --appPort=9090 -i serve-http
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+    environment:
+      - SERVER_PORT=:9090
+      - DB_HOST=db
+      - DB_PORT=27017
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+      - DB_DB=catchall
+
+
+volumes:
+  mongodb_data_container:
